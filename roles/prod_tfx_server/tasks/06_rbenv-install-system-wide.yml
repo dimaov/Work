@@ -1,0 +1,25 @@
+- name: install packages for rbenv
+  yum: name={{item}} state=present
+  with_items:
+    - gcc-c++
+    - readline
+    - readline-devel
+    - patch
+    - zlib
+    - zlib-devel
+    - libyaml-devel
+    - libffi-devel
+    - openssl-devel
+    - make
+    - bzip2
+    - autoconf
+    - automake
+    - libtool
+    - bison
+    - git-core
+    - glibc-common 
+- git: repo="git://github.com/sstephenson/rbenv.git" dest=/usr/local/rbenv
+- template: src=rbenv.j2 dest=/etc/profile.d/rbenv.sh owner=root group=root mode=0755
+- shell: source ~/.bashrc
+- file: path={{rbenv_root}}/plugins state=directory
+- git: repo="https://github.com/rbenv/ruby-build.git" dest={{rbenv_root}}/plugins/ruby-build

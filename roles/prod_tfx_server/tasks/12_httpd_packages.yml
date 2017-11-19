@@ -1,0 +1,40 @@
+- name: install httpd packages
+  yum: name={{item}} state=present
+  with_items: 
+    - httpd
+    - httpd-devel
+    - apr-devel
+    - apr-util-devel
+    - zip
+    - mod_ssl
+    - php-xml
+    - php
+    - php-pear
+- shell: pecl channel-update pecl.php.net && pecl install timezonedb
+- yum: name={{item}} state=present
+  with_items:
+    - php-cli
+    - php-gd
+    - php-imap
+    - php-mbstring
+    - php-mysql
+    - php-odbc
+    - php-pdo
+    - php-pear
+    - php-pgsql
+    - php-pspell
+    - php-snmp
+    - php-xml
+    - php-xmlrpc
+    - php-mcrypt
+    - php-intl
+    - php-devel
+- file: path=/etc/httpd/conf.d/welcome.conf state=absent
+- file: path=/var/log/virtualmin state=touch
+- unarchive: remote_src=yes src="http://www.apache.org/dist/httpd/mod_fcgid/mod_fcgid-2.3.9.tar.gz" dest=/tmp/
+- shell: cd /tmp/mod_fcgid-2.3.9/ && ./configure.apxs && make && make install
+- file: path=/tmp/mod_fcgid-2.3.9 state=absent
+- unarchive: remote_src=yes src="http://archive.apache.org/dist/httpd/httpd-2.4.6.tar.gz" dest=/tmp/
+- shell: cd /tmp/httpd-2.4.6/modules/cache/ && apxs -i -a -c mod_file_cache.c && apxs -i -a -c mod_cache_disk.c
+- file: path=/tmp/httpd-2.4.6 state=absent
+- service: name=httpd enabled=yes state=restarted

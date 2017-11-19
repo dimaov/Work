@@ -1,0 +1,42 @@
+- name: installing images compose
+  yum: name={{item}} state=present
+  with_items:
+    - advancecomp
+    - gifsicle
+    - jhead
+    - libjpeg
+    - libjpeg-devel
+    - optipng
+    - pngquant
+- unarchive: remote_src=yes src="http://www.kokkonen.net/tjko/src/jpegoptim-{{JPEGOPTIM_VERSION}}.tar.gz" dest=/tmp
+- shell: cd /tmp/jpegoptim-{{JPEGOPTIM_VERSION}} && ./configure && make && make install
+- file: path=/tmp/jpegoptim-{{JPEGOPTIM_VERSION}} state=absent
+- unarchive: remote_src=yes src="https://sourceforge.net/projects/pmt/files/pngcrush/{{PNGCRUSH_VERSION}}/pngcrush-{{PNGCRUSH_VERSION}}.tar.gz" dest=/tmp
+- shell: cd /tmp/pngcrush-{{PNGCRUSH_VERSION}} && make
+- copy: remote_src=yes src=/tmp/pngcrush-{{PNGCRUSH_VERSION}}/pngcrush dest=/usr/local/bin/
+- file: path=/tmp/pngcrush-{{PNGCRUSH_VERSION}}  state=absent
+- unarchive: remote_src=yes src="http://static.jonof.id.au/dl/kenutils/pngout-{{PNGOUT_VERSION}}-linux.tar.gz" dest=/tmp
+- copy: remote_src=yes src=/tmp/pngout-{{PNGOUT_VERSION}}-linux/i686/pngout dest=/usr/bin/pngout
+- file: path=/tmp/pngout-{{PNGOUT_VERSION}}-linux state=absent
+- git: repo='https://github.com/Hello71/zopfli.git' dest=/tmp/zopfli
+- shell: cd /tmp/zopfli && git submodule update --init && make -j2 && sudo make -j2 install
+- file: path=/tmp/zopfli state=absent
+- yum: name={{item}} state=present
+  with_items:
+    - libjpeg-devel
+    - libpng-devel
+    - libtiff-devel
+    - giflib
+- yum: name=libwebp state=removed
+- unarchive: remote_src=yes src="http://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-{{WEBP_VERSION}}.tar.gz" dest=/tmp/
+- shell: cd /tmp/libwebp-{{WEBP_VERSION}}/ && ./configure && make && make install
+- file: remote_src=yes src=/usr/local/lib/libwebp.so.6 dest=/lib/libwebp.so.6 state=link
+- yum: name={{item}} state=present
+  with_items:
+    - jxrlib
+    - jxrlib-devel
+- npm: name={{item}} state=present
+  with_items:
+    - svgo
+- npm: name=phantomjs-prebuilt state=present path=/usr/
+

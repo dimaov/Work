@@ -1,0 +1,33 @@
+#- name: update and install soft
+#  shell: yum upgrade -y
+- yum: name=epel-release state=present
+- shell: yum clean all
+- yum: name={{item}} state=latest
+  with_items:
+    - gcc
+    - gcc-c++
+    - make
+    - autoconf
+    - automake
+    - patch
+    - bison
+    - bison-devel
+    - glibc-devel
+    - libtool
+    - readline
+    - readline-devel
+    - openssl
+    - openssl-devel
+    - kernel-devel
+    - initscripts
+    - iptables-services
+    - git-core
+    - wget
+    - curl
+    - curl-devel
+    - bind-utils
+    - htop
+    - iotop
+- name: disable selinux
+  selinux: state=disabled
+

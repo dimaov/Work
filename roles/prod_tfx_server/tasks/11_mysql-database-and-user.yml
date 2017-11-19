@@ -1,0 +1,14 @@
+- name: create mysql users
+  yum: name=python-devel state=present
+- pip: name=MySQL-python
+- mysql_user: login_user=root name=root password="{{MYSQLROOTPASSWORD}}" update_password=always
+- mysql_user: login_user=root login_password="{{MYSQLROOTPASSWORD}}" name=root host="{{ansible_hostname}}" state=absent
+- mysql_user: login_user=root login_password="{{MYSQLROOTPASSWORD}}" name='' host_all=yes state=absent
+- mysql_db: login_user=root login_password="{{MYSQLROOTPASSWORD}}" name={{item.name}} state={{item.state}}
+  with_items:
+    - { name: 'test', state: 'absent' }
+    - { name: '{{db_name}}', state: 'present' }
+- mysql_user: login_user=root login_password="{{MYSQLROOTPASSWORD}}" name="{{db_username}}" password="{{db_password}}" priv='*.*:ALL'
+- service: name=mariadb state=restarted
+
+

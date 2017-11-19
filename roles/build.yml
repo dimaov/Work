@@ -1,0 +1,4 @@
+---
+- hosts: test
+  roles:
+    - prod_tfx_server

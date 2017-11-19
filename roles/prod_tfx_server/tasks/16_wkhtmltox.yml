@@ -1,0 +1,23 @@
+- name: install wkhtmltox
+  yum: name={{item}} state=present
+  with_items:
+    - fontconfig
+    - libXrender
+    - libXext
+    - xorg-x11-fonts-Type1
+    - xorg-x11-fonts-75dpi
+    - freetype
+    - libpng
+    - zlib
+    - libjpeg-turbo
+    - urw-fonts
+    - openssl-devel
+#- get_url: url="https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{WKHTMLTOX_VERSION}}/wkhtmltox-{{WKHTMLTOX_VERSION}}_linux-generic-amd64.tar.xz" dest=/tmp
+- unarchive: remote_src=yes src="https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{WKHTMLTOX_VERSION}}/wkhtmltox-{{WKHTMLTOX_VERSION}}_linux-generic-amd64.tar.xz" dest=/tmp/
+- copy: remote_src=yes src={{item.src}} dest={{item.dest}}
+  with_items:
+    - { src: '/tmp/wkhtmltox/bin/wkhtmltopdf', dest: '/bin/' }
+    - { src: '/tmp/wkhtmltox/bin/wkhtmltoimage', dest: '/bin/' }
+    - { src: '/bin/wkhtmltopdf', dest: '/usr/local/bin/' }
+    - { src: '/bin/wkhtmltoimage', dest: '/usr/local/bin/' }
+

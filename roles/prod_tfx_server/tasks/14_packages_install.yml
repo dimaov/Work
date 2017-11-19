@@ -1,0 +1,5 @@
+- git: repo="https://github.com/letsencrypt/letsencrypt" dest=/opt/letsencrypt
+- shell: /opt/letsencrypt/letsencrypt-auto
+- yum: name=monit state=present
+- service: name=monit state=restarted
+

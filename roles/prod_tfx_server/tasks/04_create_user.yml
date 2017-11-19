@@ -1,0 +1,7 @@
+- name: create user
+  group: name=clam
+- user: name="{{username}}" generate_ssh_key=yes shell=/bin/bash groups=clam,apache password="{{ lookup('password', '/root/{{username}}-password.txt encrypt=md5_crypt') }}"
+- file: path=/home/{{username}}/fcgi-bin state=directory
+- copy: src=../configs/php5.fcgi dest=/home/{{username}}/fcgi-bin/php5.fcgi
+
+

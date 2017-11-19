@@ -1,0 +1,14 @@
+- name: install nginx
+  shell: yum clean all
+- yum: name={{item}} state=present
+  with_items:
+    - pygpgme
+    - curl
+    - ntp
+- service: name=ntpd state=restarted
+- get_url: url="https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo" dest=/etc/yum.repos.d/el-passenger.repo
+- shell: yum install -y nginx passenger || yum-config-manager --enable cr && sudo yum install -y nginx passenger
+- copy: src=../configs/nginx.conf dest=/etc/nginx/nginx.conf
+- copy: src=../configs/passenger.conf dest=/etc/nginx/conf.d/
+- service: name=nginx enabled=yes state=restarted
+

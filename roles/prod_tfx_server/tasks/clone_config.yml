@@ -1,0 +1,8 @@
+- name: clone config
+  git: repo="git@bitbucket.org:taxesforexpats/config.git" accept_hostkey=true dest=/tmp/prod_config
+- file: path=/home/taxesfor/rails_apps/taxesforexpats/shared/config state=directory
+- copy: remote_src=yes src={{item}} dest=/home/taxesfor/rails_apps/taxesforexpats/shared/config/
+  with_items:
+    - /tmp/prod_config/*.yml
+    - /tmp/prod_config/*.enc
+

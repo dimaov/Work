@@ -1,0 +1,8 @@
+- name: install office packages
+  yum: name={{item}} state=present
+  with_items:
+    - libreoffice-headless
+    - libreoffice-writer
+    - libreoffice-impress
+    - libreoffice-calc
+

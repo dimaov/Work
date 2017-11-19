@@ -1,0 +1,11 @@
+- name: install mysql
+  yum: name={{item}} state=present
+  with_items:
+    - mysql
+    - mariadb
+    - mariadb-server
+    - mariadb-devel
+    - mysql-devel
+- file: path=/var/log/mysql-log-slow-queries.log owner=mysql group=mysql state=touch
+- service: name=mariadb enabled=yes state=started
+

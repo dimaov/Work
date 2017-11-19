@@ -1,0 +1,27 @@
+- name: install rails
+  yum: name={{item}} state=present
+  with_items:
+    - zlib
+    - zlib-devel
+    - bzip2
+    - bzip2-devel
+    - libyaml
+    - libyaml-devel
+    - libffi
+    - libffi-devel
+    - libxml2
+    - libxml2-devel
+    - libxslt
+    - libxslt-devel
+- shell: rbenv install 2.4.1 && rbenv global 2.4.1 && rbenv rehash
+- shell: gem update --system
+- gem: name={{item}} state=present
+  with_items:
+    - bundler
+    - rake
+    - munin-plugins-rails
+    - zopfli
+    - htmlcompressor
+- gem: name=rails version=5.1.4 state=present
+- shell: rbenv rehash
+

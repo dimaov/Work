@@ -1,0 +1,12 @@
+- name: install antivir
+  yum: name={{item}} state=present
+  with_items:
+    - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    - clamav-devel
+    - clamav-milter
+    - clamav
+- copy: src=../configs/clamd.conf dest=/etc/clamd.conf
+- file: path=/etc/clamd.d/scan.conf state=absent
+- file: remote_src=yes src=/etc/clamd.conf dest=/etc/clamd.d/scan.conf state=link
+- file: path=/var/run/clamd.scan group=virusgroup recurse=yes
+

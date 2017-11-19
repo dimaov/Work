@@ -1,0 +1,3 @@
+- name: install mailcatcher
+  yum: name=sqlite-devel state=present
+- gem: name=mailcatcher state=present

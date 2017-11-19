@@ -1,0 +1,13 @@
+- name: installing clamav server
+  yum: name={{item}} state=present
+  with_items:
+    - httpd
+    - epel-release
+    - clamav-server
+    - clamav-data
+    - clamav-update
+    - clamav-filesystem
+    - clamav-scanner-systemd
+    - clamav-devel
+    - clamav-lib
+    - clamav-server-systemd

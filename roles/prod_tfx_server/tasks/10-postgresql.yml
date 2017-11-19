@@ -1,0 +1,26 @@
+- name: install postgress
+  yum: name={{item}} state=present
+  with_items:
+    - postgresql-server
+    - postgresql-contrib
+    - postgresql-devel
+    - python-pip
+- pip: name=psycopg2 state=present
+- shell: postgresql-setup initdb
+- service: name=postgresql enabled=yes state=restarted
+- name: postgress user
+  postgresql_db: login_user=postgres name=taxdome_production state=present
+  become: true
+  become_user: postgres
+- postgresql_user: login_user=postgres name=taxdome_dbuser password="{{postgres_db_pass}}"
+  become: true
+  become_user: postgres
+- postgresql_privs: login=postgres database=taxdome_production type=database roles=taxdome_dbuser privs=ALL state=present
+  become: true
+  become_user: postgres
+- postgresql_ext: login_user=postgres db=taxdome_production name={{item}} state=present
+  with_items:
+    - citext
+    - ltree
+  become: true
+  become_user: postgres

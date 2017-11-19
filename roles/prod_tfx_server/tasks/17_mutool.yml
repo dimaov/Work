@@ -1,0 +1,9 @@
+- name: mutool install
+  yum: name={{item}} state=present
+  with_items:
+    - mesa-libGL-devel
+    - mesa-libGLU-devel
+    - libXi-devel
+    - libXrandr-devel
+  git: repo="git://git.ghostscript.com/mupdf.git" dest=/tmp/mupdf
+- shell: cd /tmp/mupdf && make && make install

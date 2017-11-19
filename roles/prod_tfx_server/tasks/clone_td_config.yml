@@ -1,0 +1,11 @@
+- name: clone config td
+  file: path=/tmp/prod_config state=absent
+- git: repo="git@bitbucket.org:taxesforexpats/config.git" dest=/tmp/prod_config
+- file: path=/home/taxesfor/taxdome/shared/config recurse=yes state=directory
+- copy: remote_src=yes src={{item}} dest=/home/taxesfor/taxdome/shared/config/
+  with_items:
+    - /tmp/prod_config/taxdome/*.yml
+    - /tmp/prod_config/taxdone/*.enc
+    - /tmp/prod_config/taxdome/*.key
+
+
