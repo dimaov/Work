@@ -1,0 +1,5 @@
+- name: install Capsule Database Helper
+  file: path=/opt/db_helper state=directory
+- template: src=composer.j2 dest=/opt/db_helper/composer.json
+- shell: cd /opt/db_helper/ && composer install -d .
+

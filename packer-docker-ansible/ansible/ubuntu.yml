@@ -1,0 +1,14 @@
+---
+- hosts: all
+  roles:
+    - gcc
+    - openssl-1.0.2
+    - php7.0
+    - nginx-1.8.1
+    - mysql-5.6
+    - ratchet
+    - Capsule_Database_Helper
+    - laravel
+    - ruby
+    - git
+

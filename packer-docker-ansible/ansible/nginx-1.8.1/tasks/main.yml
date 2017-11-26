@@ -1,0 +1,13 @@
+- name: install nginx-1.8.1
+  blockinfile: 
+    path: /etc/apt/sources.list
+    block: |
+     deb http://nginx.org/packages/ubuntu/ trusty nginx
+     deb-src http://nginx.org/packages/ubuntu/ trusty nginx
+- apt:
+   update_cache: yes
+   name: nginx=1.8.1*
+   state: present
+   force: yes
+- service: name=apache2 state=stopped enabled=no
+- service: name=nginx state=started enabled=yes

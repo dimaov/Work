@@ -1,0 +1,19 @@
+# Required PHP Installed Before Running This Role
+- name: install Ratcher
+  apt: name={{item}} state=present
+  with_items:
+    - git
+    - curl
+    - libcurl3
+    - libcurl3-dev
+    - php-mbstring
+    - php7.0-mbstring
+    - php7.0-dom
+    - zip
+    - unzip
+    - php7.0-zip
+- shell: cd {{dir}} && curl -s https://getcomposer.org/installer | php
+- template: src=composer.j2 dest={{dir}}/composer.json
+- shell: cd {{dir}} && php composer.phar install
+- copy: remote_src=yes src={{dir}}/composer.phar dest=/usr/local/bin/composer mode=0755
+- file: path={{dir}}/composer.json state=absent

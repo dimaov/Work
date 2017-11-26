@@ -1,0 +1,5 @@
+- name: installing openssl-1.0.2.
+  apt: name=make state=present
+- unarchive: remote_src=yes src=https://www.openssl.org/source/openssl-1.0.2h.tar.gz dest=/tmp/ validate_certs=false
+- shell: cd /tmp/openssl-1.0.2h && ./config && make install
+- file: src=/usr/local/ssl/bin/openssl dest=/usr/bin/openssl state=link force=yes

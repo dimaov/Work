@@ -1,0 +1,17 @@
+# PHP needs to be installed first use php7.0 role for installing
+- name: install Laravel
+  apt: name={{item}} state=present
+  with_items:
+    - git
+    - curl
+    - libcurl3
+    - libcurl3-dev
+    - php-mbstring
+    - php7.0-mbstring
+    - php7.0-dom
+    - zip
+    - unzip
+    - php7.0-zip
+- shell: cd /opt && curl -sS https://getcomposer.org/installer | php
+- copy: remote_src=yes src=/opt/composer.phar dest=/usr/local/bin/composer
+- file: path=/usr/local/bin/composer mode=0755

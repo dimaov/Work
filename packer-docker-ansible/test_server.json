@@ -1,0 +1,37 @@
+{
+
+    "variables": {
+        "ansible_roles_path": "./ansible"
+    },
+    "builders":[{
+        "type": "docker",
+        "image": "ubuntu:14.04",
+        "pull": false,
+        "export_path": "zapalean_test_image.tar"
+    }],
+    "provisioners":[
+        {
+	    "type": "shell",
+	    "inline": [
+		"apt-get update",
+		"apt-get install -y python-software-properties"
+	    ]
+	},
+
+
+        {
+            "type": "ansible",
+            "ansible_env_vars": [
+                "ANSIBLE_ROLES_PATH={{user `ansible_roles_path` }}"
+            ],
+            "playbook_file": "ansible/ubuntu.yml"
+        }
+    ],
+    "post-processors": [
+        {
+            "type": "docker-import",
+            "repository": "dimaov/test",
+            "tag": "0.2"
+        }
+    ]
+}

@@ -1,0 +1,4 @@
+- name: install openssh 6.6
+  apt: name=zlib1g-dev state=present
+- get_url: url="http://security.ubuntu.com/ubuntu/pool/main/o/openssh/openssh-server_6.6p1-2ubuntu1_amd64.deb" dest=/tmp/
+- shell: cd /tmp && dpkg -i openssh-server_6.6p1-2ubuntu1_amd64.deb
