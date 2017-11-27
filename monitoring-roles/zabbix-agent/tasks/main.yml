@@ -1,6 +1,7 @@
 - name: install zabbix-agent
-  yum: name={{item}}  state=present
+  get_url: url="http://repo.zabbix.com/zabbix/{{zabbix_agent_version}}/rhel/7/x86_64/zabbix-release-{{zabbix_agent_version}}-1.el7.noarch.rpm" dest=/tmp/
+- yum: name={{item}} state=present
   with_items:
-    - "http://repo.zabbix.com/zabbix/{{zabbix_agent_version}}/rhel/7/x86_64/zabbix-release-{{zabbix_agent_version}}-1.el7.noarch.rpm"
+    - '/tmp/zabbix-release-{{zabbix_agent_version}}-1.el7.noarch.rpm'
     - zabbix-agent
-- service: name=zabbix-agent state=started enabled=yes
+- service: name=zabbix-agent state=restarted enabled=yes
