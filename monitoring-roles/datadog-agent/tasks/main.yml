@@ -1,0 +1,9 @@
+- name: install datadog agent
+  template: src=datadog.repo.j2 dest=/etc/yum.repos.d/datadog.repo
+- yum: name=datadog-agent state=present
+- lineinfile:
+    path: /etc/dd-agent/datadog.conf.example
+    regexp: ^api_key
+    line: 'api_key: {{key}}'
+- copy: remote_src=yes src=/etc/dd-agent/datadog.conf.example dest=/etc/dd-agent/datadog.conf
+- service: name=datadog-agent state=restarted enabled=yes

@@ -1,0 +1,6 @@
+- name: install zabbix-agent
+  yum: name={{item}}  state=present
+  with_items:
+    - "http://repo.zabbix.com/zabbix/{{zabbix_agent_version}}/rhel/7/x86_64/zabbix-release-{{zabbix_agent_version}}-1.el7.noarch.rpm"
+    - zabbix-agent
+- service: name=zabbix-agent state=started enabled=yes
