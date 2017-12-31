@@ -1,0 +1,31 @@
+- name: install php-fpm
+  yum: name={{item}} state=present
+  with_items:
+    - epel-release
+    - php
+    - php-fpm
+- local_action: stat path={{role_path}}/files/php.ini
+  register: ini
+- copy: src={{role_path}}/files/php.ini dest=/etc/
+  when: ini.stat.exists == True
+- lineinfile:
+    path: /etc/php.ini
+    regexp: ';cgi.fix_pathinfo=1'
+    line: cgi.fix_pathinfo=0
+  when: ini.stat.exists == False
+- local_action: stat path={{role_path}}/files/*.conf
+  register: www
+- copy: src={{item}} dest=/etc/php-fpm.d/ 
+  with_fileglob: /{{role_path}}/files/*.conf
+  when: www.stat.exists == True
+- lineinfile: path=/etc/php-fpm.d/www.conf regexp={{item.regexp}} line={{item.line}} state=present backrefs=yes
+  with_items:
+    - { regexp: 'listen = ', line: 'listen = /var/run/php-fpm/php-fpm.sock' }
+    - { regexp: ';listen.owner = ', line: 'listen.owner = nobody' }
+    - { regexp: ";listen.group = ", line: 'listen.group = nobody' }
+    - { regexp: 'user =', line: "user = {{user}}" }
+    - { regexp: "group =", line: "group = {{user}}" }
+  when: www.stat.exists == False
+- service: name=php-fpm state=restarted enabled=yes
+
+

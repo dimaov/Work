@@ -1,0 +1,28 @@
+### creating users in list ###
+- name: create users
+  user: name={{item}} state=present
+  with_items: "{{users}}"
+- file: path=/home/{{item}}/.ssh state=directory
+  with_items: "{{users}}"
+
+### put user's keys in their home dirs ####
+- template: src={{item}}-authorized_keys.j2 dest=/home/{{item}}/.ssh/authorized_keys
+  with_items: "{{users}}"
+
+#### removes if not in list ####
+- name: removing if not in list
+  shell: "getent passwd | awk -F: '$3 > 1004 {print $1}'"
+  register: remove
+- user: name={{item}} state=absent remove=yes
+  with_items: "{{remove.stdout_lines}}"
+  when: item not in users
+
+### sudo for specified users ###
+- name: sudo access for users
+  lineinfile:
+     path: /etc/sudoers
+     regexp: '{{item}}'
+     line: "{{item}} ALL=(ALL)       NOPASSWD: ALL"
+     state: present
+  with_items: "{{sudo}}"
+
