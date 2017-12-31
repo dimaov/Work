@@ -1,0 +1,14 @@
+---
+- hosts: test
+  vars:
+    users:
+      - user3
+      - user4
+  become: yes
+  tasks:
+  - name: create users
+    user: name="{{item}}" generate_ssh_key=yes  password="{{ lookup('password', '/root/{{item}}-password.txt encrypt=md5_crypt') }}"
+    with_items: "{{users}}"
+  - become_user: "{{item}}"
+    shell: google-authenticator -t -d -f -r 3 -R 30 -W
+    with_items: "{{users}}"
