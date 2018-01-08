@@ -1,0 +1,8 @@
+- name: install supervisor
+  apt: name=supervisor update_cache=yes state=latest
+- name: copying configs
+  copy: src={{item}} dest=/etc/supervisor/conf.d/
+  with_fileglob: /{{role_path}}/files/*.conf
+  ignore_errors: yes
+- service: name=supervisor state=restarted
+

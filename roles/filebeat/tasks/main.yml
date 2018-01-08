@@ -1,0 +1,12 @@
+- name: install filebeat
+  get_url:
+    url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.1.1-amd64.deb
+    dest: /tmp/filebeat-6.1.1-amd64.deb
+    mode: 0750
+- shell: dpkg -i /tmp/filebeat-6.1.1-amd64.deb
+- name: copying configs
+  copy: src={{item}} dest=/etc/filebeat/
+  with_fileglob: /{{role_path}}/files/*.yml
+  ignore_errors: yes
+
+

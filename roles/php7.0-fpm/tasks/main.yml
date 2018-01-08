@@ -1,0 +1,21 @@
+- name: install php-fpm
+  apt_repository: repo="ppa:ondrej/php" state=present
+- apt: name=php7.0-fpm state=present
+- local_action: stat path={{role_path}}/files/php-fpm.conf
+  register: phpfpm
+- copy: src={{role_path}}/files/php-fpm.conf dest=/etc/php/7.0/fpm/
+  when: phpfpm.stat.exists == True
+- local_action: stat path={{role_path}}/files/php.ini
+  register: phpini
+- copy: src={{role_path}}/files/php.ini dest=/etc/php/7.0/fpm/
+  when: phpini.stat.exists == True
+- name: copying configs
+  copy: src={{item}} dest=/etc/php/7.0/fpm/conf.d/
+  with_fileglob: /{{role_path}}/files/*.ini
+  ignore_errors: yes
+- file: path=/etc/php/7.0/fpm/conf.d/php.ini  state=absent
+- service: name=php7.0-fpm state=restarted
+
+
+
+
