@@ -1,0 +1,14 @@
+- name: installing nginx
+  apt: name=nginx state=present
+- local_action: stat path={{role_path}}/files/nginx.conf
+  register: nginx
+- copy: src={{role_path}}/files/nginx.conf dest=/etc/nginx/
+  when: nginx.stat.exists == True
+- name: copying configs
+  copy: src={{item}} dest=/etc/nginx/sites-available/
+  with_fileglob: /{{role_path}}/files/*.conf
+  ignore_errors: yes
+- file: path=/etc/nginx/sites-available/nginx.conf state=absent
+  ignore_errors: yes
+- service: name=nginx state=restarted enabled=yes
+ 

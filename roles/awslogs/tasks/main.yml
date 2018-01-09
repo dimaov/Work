@@ -1,0 +1,5 @@
+- name: installing awslogs
+  get_url: url=https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py dest=/tmp/
+- template: src=awsconf.j2 dest=/tmp/awsconf
+- shell: python /tmp/awslogs-agent-setup.py -n --region {{region}} --configfile=/tmp/awsconf 
+- service: name=awslogs state=restarted
