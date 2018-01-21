@@ -1,0 +1,1 @@
+options: "--user=www-data --group=www-data --with-debug --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_realip_module --with-http_auth_request_module --with-http_addition_module --with-http_gunzip_module --with-http_gzip_static_module --add-module=/usr/src/modsecurity-2.9.1/nginx/modsecurity --with-openssl=../openssl-1.0.2k"
