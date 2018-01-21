@@ -1,35 +1,44 @@
-- name: inastall pcre
-  unarchive: remote_src=yes src="ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz" dest=/tmp/ validate_certs=no 
-- shell: cd /tmp/pcre-8.41 && ./configure && make && make install
-- name: installing zlib
-  unarchive: remote_src=yes src="http://zlib.net/zlib-1.2.11.tar.gz" dest=/tmp/ validate_certs=no
-- shell: cd /tmp/zlib-1.2.11 && ./configure && make && make install
-- name: installing openssl
-  unarchive: remote_src=yes src="http://www.openssl.org/source/openssl-1.0.2k.tar.gz" dest=/tmp/ validate_certs=no
-- shell: cd /tmp/openssl-1.0.2k && ./config --prefix=/usr && make && make install
-- name: install modsecurity
-  unarchive: remote_src=yes src="https://www.modsecurity.org/tarball/2.9.1/modsecurity-2.9.1.tar.gz" dest=/usr/src/ validate_certs=no
-- apt: name={{item}} state=present
+- name: install initial packages
+  apt: name={{item}} state=present
   with_items:
-    - libxml2 
+    - build-essential
+    - gcc
+    - g++
+    - libxml2
     - libxml2-dev
     - apache2-threaded-dev
     - libcurl4-gnutls-dev
-- shell: cd /usr/src/modsecurity-2.9.1 && ./configure --enable-standalone-module && make
-- name: installing nginx
-  unarchive: src=https://nginx.org/download/nginx-1.8.1.tar.gz dest=/tmp/ remote_src=yes validate_certs=no
-- shell: cd /tmp/nginx-1.8.1 && ./configure {{options}} && make && make install
-- file: path=/usr/local/nginx/conf/base_rules state=directory
-- file: src=/usr/local/nginx/sbin/nginx dest=/usr/sbin/nginx state=link force=yes
-- template: src=nginx.j2 dest=/etc/init.d/nginx mode=0755
+- name: downloading dependencies
+  unarchive: remote_src=yes src={{item.src}} dest={{item.dest}} validate_certs=no
+  with_items:
+    - { src: 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz', dest: '/tmp/' }
+    - { src: 'http://zlib.net/zlib-1.2.11.tar.gz', dest: '/tmp/' }
+    - { src: 'http://www.openssl.org/source/openssl-1.0.2k.tar.gz', dest: '/tmp/' }
+    - { src: 'https://www.modsecurity.org/tarball/2.9.1/modsecurity-2.9.1.tar.gz', dest: '/usr/src/' }
+    - { src: 'https://nginx.org/download/nginx-1.8.1.tar.gz', dest: '/tmp/' }
+- name: installing dependencies
+  shell: cd {{item.dest}} && {{item.command}} && make && {{item.comm2}}
+  with_items:
+    - { dest: '/tmp/pcre-8.41', command: './configure', comm2: 'make install'  }
+    - { dest: '/tmp/zlib-1.2.11', command: './configure', comm2: 'make install' }
+    - { dest: '/tmp/openssl-1.0.2k', command: './config --prefix=/usr', comm2: 'make install' }
+    - { dest: '/usr/src/modsecurity-2.9.1', command: './configure --enable-standalone-module', comm2: 'echo "" ' }
+    - { dest: '/tmp/nginx-1.8.1', command: './configure {{options}}', comm2: 'make install' }
+- name: create initd script
+  template: src=nginx.j2 dest=/etc/init.d/nginx mode=0755
+- file: path={{item.path}} state={{item.state}}
+  with_items:
+    - { path: '/usr/local/nginx/conf/base_rules', state: 'directory' }
+    - { path: '/var/log/nginx', state: 'directory' }
+    - { path: '/var/log/nginx/access.log', state: 'touch' }                 
 - copy: src={{item}} dest=/usr/local/nginx/conf/base_rules/
   with_fileglob: /{{role_path}}/files/base_rules/*
   ignore_errors: yes
 - copy: src={{item}} dest=/usr/local/nginx/conf/
   with_fileglob: /{{role_path}}/files/*
   ignore_errors: yes
-- file: path=/var/log/nginx state=directory
-- file: path=/var/log/nginx/access.log state=touch
-- shell: service nginx stop;service nginx start
+
+- file: src=/usr/local/nginx/sbin/nginx dest=/usr/sbin/nginx state=link force=yes
+- service: name=nginx state=restarted
 
  
