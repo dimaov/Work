@@ -1,0 +1,65 @@
+- name: downloading node-exporter package
+  unarchive: remote_src=yes src="https://github.com/prometheus/node_exporter/releases/download/v0.15.1/node_exporter-0.15.1.linux-amd64.tar.gz" dest=/tmp/ validate_certs=no
+- name: copy node-exporter binary to /usr/local/bin
+  copy: remote_src=yes src="/tmp/node_exporter-0.15.1.linux-amd64/node_exporter" dest=/usr/local/bin/ mode=0755
+- name: create systemd service file for node-exporter
+  template: src=node-exporter.j2 dest=/etc/systemd/system/node_exporter.service
+- name: reload systemd daemon
+  shell: systemctl daemon-reload
+- name: starting node_exporter service
+  service: name=node_exporter state=started enabled=yes
+
+- name: install pip
+  apt: name=python-pip state=present
+- name: install docker-py with pip
+  pip: state=present name='{{ item }}'
+  with_items:
+    - docker-py==1.2.3
+    - six==1.10.0
+- name: install docker daemon
+  shell: apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+- name: add docker repo
+  apt_repository: repo="deb https://apt.dockerproject.org/repo ubuntu-xenial main" state=present
+- name: install docker-engine
+  apt: name=docker-engine state=present
+- name: starting docker daemon
+  service: name=docker state=started enabled=yes
+- name: install advisor for container monitoring
+  docker:
+    name: cadvisor
+    image: google/cadvisor
+    state: started
+    volumes:
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:rw"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker:/var/lib/docker:ro"
+    ports:
+      - "9200:8080"
+
+- name: update prometheus configuration
+  local_action:
+    module: blockinfile
+    path: "{{role_path}}/files/prometheus.yaml"
+    state: present
+    insertafter: EOF
+    block: |
+        - job_name: "{{inventory_hostname}}-node-exporter"
+          scrape_interval: 5
+          static_configs:
+            - targets:
+                - {{inventory_hostname}}:9100
+
+- name: update prometehus configuration for containers monitoring
+  local_action:
+    module: blockinfile
+    path: "{{role_path}}/files/prometheus.yaml"
+    state: present
+    insertafter: EOF
+    block: |
+         - job_name: "{{inventory_hostname}}-cadvisor"
+           scrape_interval: 5s
+           static_configs:
+             - targets:
+                 - {{inventory_hostname}}:9200
+      
