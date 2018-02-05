@@ -1,0 +1,13 @@
+---
+- hosts: test
+  become: yes
+  roles:
+    - prometheus-agent 
+
+- hosts: prometheus
+  become: yes
+  tasks:
+  - name: copy yaml
+    copy: src=roles/prometheus-agent/files/prometheus.yml dest=/root/
+  - name: restart docker container
+    shell: docker restart prometheus
